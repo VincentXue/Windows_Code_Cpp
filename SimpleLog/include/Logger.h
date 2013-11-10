@@ -1,7 +1,5 @@
 #pragma once
-
-#include <Windows.h>
-#include <sstream>
+#include <iosfwd>
 
 #ifdef SIMPLELOG_EXPORTS
 #define SIMPLELOG_API __declspec(dllexport)
@@ -24,28 +22,19 @@ public:
 public:
     CLogger(const char* pszCodeFile, int nLine, LogLevel level);
     ~CLogger(void);
-    std::stringstream& LogStart();
-
-private:
+    void LogStart();
+    void SetLogContent(const char* logContent);
     void LogFinish();
+private:
     const char* GetLogLevelName(LogLevel level);
 
 public:
-    static LogLevel      m_baseLevel;
-    static BOOL          m_bAsync;
+    static LogLevel      m_baseLevel;//log should be recorded only when m_level >= m_baseLevel
+    static bool          m_bAsync;
 
 private:
-    std::stringstream    m_stream;
+    std::stringstream*   m_stream;
     char                 szFilepath[512];
     int                  m_nLine;
     LogLevel             m_level;
 };
-
-#define LOG_DEBUG if (CLogger::LEVEL_DEBUG >= CLogger::m_baseLevel)\
-    (CLogger(__FILE__, __LINE__, CLogger::LEVEL_DEBUG).LogStart()
-
-#define LOG_INFO if (CLogger::LEVEL_INFO >= CLogger::m_baseLevel)\
-    CLogger(__FILE__, __LINE__, CLogger::LEVEL_INFO).LogStart()
-
-#define LOG_ERROR if (CLogger::LEVEL_ERROR >= CLogger::m_baseLevel)\
-    CLogger(__FILE__, __LINE__, CLogger::LEVEL_ERROR).LogStart()
